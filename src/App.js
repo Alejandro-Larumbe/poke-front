@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import Cookies from 'js-cookie';
 
+import { baseUrl } from './config';
 import LoginPanel from './LoginPanel';
 import PokemonBrowser from './PokemonBrowser';
 
@@ -16,23 +16,11 @@ const PrivateRoute = ({ component: Component, cProps, ...rest }) => (
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const authToken = Cookies.get("token");
-    let currentUserId;
-    if (authToken) {
-      try {
-        const payload = authToken.split(".")[1];
-        const decodedPayload = atob(payload);
-        const payloadObj = JSON.parse(decodedPayload);
-        const { data } = payloadObj;
-        currentUserId = data.id;
-      } catch (e) {
-        Cookies.remove("token");
-      }
-    }
+    const token = window.localStorage.getItem('state-pokedex-token');
     this.state = {
       loaded: false,
-      currentUserId,
-      needLogin: !currentUserId,
+      token,
+      needLogin: !token,
     };
   }
 
@@ -48,7 +36,9 @@ class App extends React.Component {
   }
 
   async loadPokemon() {
-    const response = await fetch(`/api/pokemon`);
+    const response = await fetch(`${baseUrl}/pokemon`, {
+      headers: { Authorization: `Bearer ${this.state.token}`}
+    });
     if (response.ok) {
       const pokemon = await response.json();
       this.setState({
@@ -62,10 +52,11 @@ class App extends React.Component {
     }
   }
 
-  updateUser = currentUserId => {
+  updateToken = token => {
+    window.localStorage.setItem('state-pokedex-token', token);
     this.setState({
       needLogin: false,
-      currentUserId
+      token
     });
     this.loadPokemon();
   }
@@ -77,13 +68,13 @@ class App extends React.Component {
     const cProps = {
       pokemon: this.state.pokemon,
       handleCreated: this.handleCreated,
-      currentUserId: this.state.currentUserId
+      token: this.state.token
     };
     return (
       <BrowserRouter>
         <Switch>
           <Route path="/login"
-            render={props => <LoginPanel {...props} updateUser={this.updateUser} />} />
+            render={props => <LoginPanel {...props} updateToken={this.updateToken} />} />
           <PrivateRoute path="/"
                         exact={true}
                         needLogin={this.state.needLogin}

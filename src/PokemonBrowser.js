@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink, Route } from 'react-router-dom';
 
+import { imageUrl } from './config';
 import LogoutButton from './LogoutButton';
 import PokemonDetail from './PokemonDetail';
 import PokemonForm from './PokemonForm';
@@ -34,7 +35,7 @@ class PokemonBrowser extends Component {
     }
     return (
       <main>
-        <LogoutButton />
+        <LogoutButton token={this.props.token} />
         <nav>
           <Fab hidden={this.state.showForm} onClick={this.showForm} />
           {this.props.pokemon.map(pokemon => {
@@ -42,7 +43,7 @@ class PokemonBrowser extends Component {
               <NavLink key={pokemon.name} to={`/pokemon/${pokemon.id}`}>
                 <div className={pokemonId === pokemon.id ? 'nav-entry is-selected' : 'nav-entry'}>
                   <div className="nav-entry-image"
-                       style={{backgroundImage: `url('${pokemon.imageUrl}')`}}>
+                       style={{backgroundImage: `url('${imageUrl}${pokemon.imageUrl}')`}}>
                   </div>
                   <div>
                     <div className="primary-text">{pokemon.name}</div>
@@ -54,9 +55,9 @@ class PokemonBrowser extends Component {
           })}
         </nav>
         { this.state.showForm ?
-          <PokemonForm handleCreated={this.handleCreated} /> :
+          <PokemonForm token={this.props.token} handleCreated={this.handleCreated} /> :
           <Route path="/pokemon/:id" render={props =>
-            <PokemonDetail {...props} />
+            <PokemonDetail {...props} token={this.props.token} />
           } />
         }
       </main>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-
+import { baseUrl } from './config';
 
 class LogoutButton extends Component {
   constructor(props) {
@@ -11,8 +11,9 @@ class LogoutButton extends Component {
   }
 
   logout = () => {
-    fetch(`/api/session`, {
-      method: 'delete'
+    fetch(`${baseUrl}/session`, {
+      method: 'delete',
+      headers: { Authorization: `Bearer ${this.props.token}` },
     }).then(() => this.setState({ loggedOut: true }));
   }
 
