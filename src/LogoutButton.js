@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { baseUrl } from './config';
+import { connect } from 'react-redux';
 
 class LogoutButton extends Component {
   constructor(props) {

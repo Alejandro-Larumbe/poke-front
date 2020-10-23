@@ -7,7 +7,7 @@ import PokemonDetail from './PokemonDetail';
 import PokemonForm from './PokemonForm';
 import Fab from './Fab';
 import { connect } from 'react-redux';
-import { getPokemon } from './pokemon'
+import { getPokemon, pokemon } from './pokemon'
 
 class PokemonBrowser extends Component {
   constructor(props) {
@@ -24,6 +24,10 @@ class PokemonBrowser extends Component {
     this.props.handleCreated(pokemon)
   }
 
+  componentDidMount() {
+    this.props.getPokemon()
+  }
+
   showForm = () => {
     this.setState({
       showForm: true,
@@ -35,6 +39,7 @@ class PokemonBrowser extends Component {
     if (!this.props.pokemon) {
       return null;
     }
+    console.log(this.props)
     return (
       <main>
         <LogoutButton token={this.props.token} />
@@ -67,4 +72,21 @@ class PokemonBrowser extends Component {
   }
 }
 
-export default PokemonBrowser;
+const mapStateToProps = (state) => (
+  {
+    pokemon: state.pokemon.list
+  }
+)
+
+const mapDispatchToProps = dispatch => {
+  return {
+    getPokemon: () => dispatch(getPokemon())
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  PokemonBrowser
+);
